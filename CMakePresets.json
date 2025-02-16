@@ -1,0 +1,22 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 30,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "windows-debug",
+            "displayName": "Windows Debug",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/windows/debug",
+            "toolchainFile": "${sourceDir}/toolchain-mingw.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "VCPKG_ROOT": "$env{VCPKG_ROOT}",
+                "VCPKG_HOST_TRIPLET": "x64-mingw-static"
+            }
+        }
+    ]
+}

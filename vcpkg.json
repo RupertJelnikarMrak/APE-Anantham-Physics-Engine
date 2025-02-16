@@ -1,0 +1,13 @@
+{
+    "name": "ape",
+    "version": "0.0.1",
+    "dependencies": [
+        "spdlog",
+        "fmt",
+        "vulkan",
+        "entt",
+        "glm",
+        "glfw3"
+    ],
+    "default-features": []
+}
