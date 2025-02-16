@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ape_device.hpp"
-#include "ape_model.hpp"
+#include "ape_game_object.hpp"
 #include "ape_pipeline.hpp"
 #include "ape_swap_chain.hpp"
 #include "ape_window.hpp"
@@ -28,7 +28,7 @@ public:
     void run();
 
 private:
-    void loadModels();
+    void loadGameObjects();
     void createPipelineLayout();
     void createPipeline();
     void createCommandBuffers();
@@ -36,6 +36,7 @@ private:
     void drawFrame();
     void recreateSwapChain();
     void recordCommandBuffer(int imageIndex);
+    void renderGameObjects(VkCommandBuffer commandBuffer);
 
     ApeWindow apeWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
     ApeDevice apeDevice{apeWindow};
@@ -43,6 +44,6 @@ private:
     std::unique_ptr<ApePipeline> apePipeline;
     VkPipelineLayout pipelineLayout;
     std::vector<VkCommandBuffer> commandBuffers;
-    std::unique_ptr<ApeModel> apeModel;
+    std::vector<ApeGameObject> gameObjects;
 };
 } // namespace ape
