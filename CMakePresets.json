@@ -17,6 +17,18 @@
                 "VCPKG_ROOT": "$env{VCPKG_ROOT}",
                 "VCPKG_HOST_TRIPLET": "x64-mingw-static"
             }
+        },
+        {
+            "name": "windows-release",
+            "displayName": "Windows Release",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/windows/rlease",
+            "toolchainFile": "${sourceDir}/toolchain-mingw.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "VCPKG_ROOT": "$env{VCPKG_ROOT}",
+                "VCPKG_HOST_TRIPLET": "x64-mingw-static"
+            }
         }
     ]
 }

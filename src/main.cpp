@@ -1,20 +1,8 @@
-#include "first_app.hpp"
-#include <exception>
-
-#include <cstdlib>
-#include <iostream>
+#include "engine/Logger.hpp"
 
 int main()
 {
-    ape::FirstApp app{};
-
-    try {
-        app.run();
-    } catch (const std::exception &e) {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+    ape::Logger::init();
 
     return EXIT_SUCCESS;
-    ;
 }
