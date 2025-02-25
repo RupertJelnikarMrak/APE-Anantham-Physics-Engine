@@ -1,4 +1,4 @@
-#include "engine/Logger.hpp"
+#include "Core/Logger.hpp"
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
@@ -12,7 +12,7 @@
 #include <ctime>
 #include <memory>
 
-namespace ape
+namespace Core
 {
 
 void Logger::init()
@@ -43,11 +43,11 @@ void Logger::init()
         std::make_shared<spdlog::logger>("ape", spdlog::sinks_init_list{console_sink, file_sink}));
     spdlog::set_level(spdlog::level::trace);
 
-    SPDLOG_TRACE("This is a trace message");
-    SPDLOG_DEBUG("This is a debug message");
-    SPDLOG_INFO("This is an info message");
-    SPDLOG_WARN("This is a warning message");
-    SPDLOG_ERROR("This is an error message");
+    // SPDLOG_TRACE("This is a trace message");
+    // SPDLOG_DEBUG("This is a debug message");
+    // SPDLOG_INFO("This is an info message");
+    // SPDLOG_WARN("This is a warning message");
+    // SPDLOG_ERROR("This is an error message");
 }
 
-} // namespace ape
+} // namespace Core

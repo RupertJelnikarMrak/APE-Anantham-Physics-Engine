@@ -8,7 +8,7 @@
 
 #include <spdlog/spdlog.h>
 
-namespace ape
+namespace Core
 {
 
 class Logger
@@ -24,4 +24,4 @@ public:
     ~Logger() = delete;
 };
 
-} // namespace ape
+} // namespace Core
