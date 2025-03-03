@@ -24,6 +24,7 @@ public:
     ApeRenderer &operator=(const ApeRenderer &) = delete;
 
     VkRenderPass getSwapChainRenderPass() const { return apeSwapChain->getRenderPass(); }
+    float getAspectRatio() const { return apeSwapChain->extentAspectRatio(); }
     bool isFrameInProgress() const { return isFrameStarted; }
 
     VkCommandBuffer getCurrentCommandBuffer() const
