@@ -14,6 +14,7 @@ find_package(Vulkan REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
+find_package(tinyobjloader CONFIG REQUIRED)
 
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/src/*.cpp
@@ -32,12 +33,24 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     EnTT::EnTT
     glm::glm
     glfw
+    tinyobjloader::tinyobjloader
 )
-
-file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 file(GLOB DEPENDENCY_DLLS CONFIGURE_DEPENDS ${DEPENDENCIES_DIR}/bin/*.dll)
 file(COPY ${DEPENDENCY_DLLS} DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+file(GLOB_RECURSE ASSET_FILES ${CMAKE_SOURCE_DIR}/assets/*)
+
+add_custom_command(
+    OUTPUT ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets.stamp
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets.stamp
+    DEPENDS ${ASSET_FILES}
+COMMENT "Copying assets to build directory"
+)
+
+add_custom_target(copy_assets DEPENDS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets.stamp)
+add_dependencies(${CMAKE_PROJECT_NAME} copy_assets)
 
 find_program(VULKAN_GLSLC_EXECUTABLE glslc)
 if(NOT VULKAN_GLSLC_EXECUTABLE)
