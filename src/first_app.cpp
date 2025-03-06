@@ -69,12 +69,12 @@ void FirstApp::run()
 
 void FirstApp::loadGameObjects()
 {
-    std::shared_ptr<ApeModel> apeModel = ApeModel::createModleFromFile(apeDevice, "assets/models/smooth_vase.obj");
+    std::shared_ptr<ApeModel> apeModel = ApeModel::createModleFromFile(apeDevice, "assets/models/flat_vase.obj");
 
     auto cube = ApeGameObject::createGameObject();
     cube.model = apeModel;
-    cube.transform.translation = {.0f, .0f, 2.5f};
-    cube.transform.scale = {.5f, .5f, .5f};
+    cube.transform.translation = {.0f, .5f, 2.5f};
+    cube.transform.scale = glm::vec3{3.f};
     gameObjects.push_back(std::move(cube));
 }
 
