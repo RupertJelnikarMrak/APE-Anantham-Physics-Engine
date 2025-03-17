@@ -1,6 +1,8 @@
 #include "first_app.hpp"
 
+#include "ape_buffer.hpp"
 #include "ape_camera.hpp"
+#include "ape_frame_info.hpp"
 #include "ape_game_object.hpp"
 #include "ape_model.hpp"
 #include "keyboard_movement_controller.hpp"
@@ -21,10 +23,9 @@
 namespace ape
 {
 
-struct SimplePushConstantData {
-    glm::mat2 transform{1.f};
-    glm::vec2 offset;
-    alignas(16) glm::vec3 color;
+struct GlobalUbo {
+    glm::mat4 projectionView{1.f};
+    glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
 };
 
 FirstApp::FirstApp() { loadGameObjects(); }
@@ -33,6 +34,15 @@ FirstApp::~FirstApp() {}
 
 void FirstApp::run()
 {
+    ApeBuffer globalUboBuffer{
+        apeDevice,
+        sizeof(GlobalUbo),
+        ApeSwapChain::MAX_FRAMES_IN_FLIGHT,
+        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+        apeDevice.properties.limits.minUniformBufferOffsetAlignment};
+    globalUboBuffer.map();
+
     SimpleRenderSystem simpleRenderSystem{apeDevice, apeRenderer.getSwapChainRenderPass()};
     ApeCamera camera{};
     camera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
@@ -57,8 +67,23 @@ void FirstApp::run()
         camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 10.f);
 
         if (auto commandBuffer = apeRenderer.beginFrame()) {
+            int frameIndex = apeRenderer.getFrameIndex();
+            FrameInfo frameInfo{
+                frameIndex,
+                frameTime,
+                commandBuffer,
+                camera,
+            };
+
+            // update
+            GlobalUbo ubo{};
+            ubo.projectionView = camera.getProjection() * camera.getView();
+            globalUboBuffer.writeToIndex(&ubo, frameIndex);
+            globalUboBuffer.flushIndex(frameIndex);
+
+            // render
             apeRenderer.beginSwapChainRenderPass(commandBuffer);
-            simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
+            simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
             apeRenderer.endSwapChainRenderPass(commandBuffer);
             apeRenderer.endFrame();
         }

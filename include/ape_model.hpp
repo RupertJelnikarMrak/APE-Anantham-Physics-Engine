@@ -1,16 +1,17 @@
 #pragma once
 
+#include "ape_buffer.hpp"
 #include "ape_device.hpp"
-#include <cstdint>
-#include <memory>
-#include <vulkan/vulkan_core.h>
 
 // libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
+#include <vulkan/vulkan_core.h>
 
 // std
+#include <cstdint>
+#include <memory>
 #include <vector>
 
 namespace ape
@@ -58,13 +59,11 @@ private:
 
     ApeDevice &apeDevice;
 
-    VkBuffer vertexBuffer;
-    VkDeviceMemory vertexBufferMemory;
+    std::unique_ptr<ApeBuffer> vertexBuffer;
     uint32_t vertexCount;
 
     bool hasIndexBuffer = false;
-    VkBuffer indexBuffer;
-    VkDeviceMemory indexBufferMemory;
+    std::unique_ptr<ApeBuffer> indexBuffer;
     uint32_t indexCount;
 };
 

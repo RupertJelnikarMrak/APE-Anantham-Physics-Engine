@@ -1,13 +1,13 @@
 #pragma once
 
-#include "ape_camera.hpp"
 #include "ape_device.hpp"
+#include "ape_frame_info.hpp"
 #include "ape_game_object.hpp"
 #include "ape_pipeline.hpp"
 
+// std
 #include <memory>
 #include <vector>
-#include <vulkan/vulkan_core.h>
 
 namespace ape
 {
@@ -21,8 +21,7 @@ public:
     SimpleRenderSystem(const SimpleRenderSystem &) = delete;
     SimpleRenderSystem &operator=(const SimpleRenderSystem &) = delete;
 
-    void
-    renderGameObjects(VkCommandBuffer commandBuffer, std::vector<ApeGameObject> &gameObjects, const ApeCamera &camera);
+    void renderGameObjects(FrameInfo &frameInfo, std::vector<ApeGameObject> &gameObjects);
 
 private:
     void createPipelineLayout();
