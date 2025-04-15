@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Rendering/Camera.hpp"
+#include "Core/Rendering/GameObject.hpp"
 
 // lib
 #include <vulkan/vulkan.h>
@@ -30,7 +31,6 @@ struct FrameInfo {
     VkCommandBuffer commandBuffer;
     Camera &camera;
     VkDescriptorSet globalDescriptorSet;
-    // LveGameObject::Map &gameObjects;
-    // TODO add objects when finished
+    GameObject::Map &gameObjects;
 };
 } // namespace Core::Rendering

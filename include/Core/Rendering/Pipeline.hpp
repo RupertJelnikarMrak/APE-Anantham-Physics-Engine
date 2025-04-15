@@ -33,6 +33,7 @@ struct PipelineConfigInfo {
 
 class Pipeline
 {
+
 public:
     Pipeline(
         Device &device,

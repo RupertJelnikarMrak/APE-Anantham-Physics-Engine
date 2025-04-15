@@ -1,9 +1,8 @@
 #pragma once
 
-#include "ape_game_object.hpp"
-#include "ape_window.hpp"
+#include "Core/Rendering/GameObject.hpp"
 
-namespace ape
+namespace Core
 {
 
 class KeyboardMovementController
@@ -22,11 +21,11 @@ public:
         int lookDown = GLFW_KEY_DOWN;
     };
 
-    void moveInPlaneXZ(GLFWwindow *window, float deltaTime, ApeGameObject &gameObject);
+    void moveInPlaneXZ(GLFWwindow *window, float dt, Rendering::GameObject &gameObject);
 
     KeyMappings keys{};
     float moveSpeed{3.f};
     float lookSpeed{1.5f};
 };
 
-} // namespace ape
+} // namespace Core
