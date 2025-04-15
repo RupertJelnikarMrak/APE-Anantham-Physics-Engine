@@ -2,8 +2,8 @@
 
 #include "Core/Rendering/Buffer.hpp"
 #include "Core/Rendering/Camera.hpp"
-#include "Core/Systems/point_light_system.hpp"
-#include "Core/Systems/simple_render_system.hpp"
+#include "Core/System/point_light_system.hpp"
+#include "Core/System/simple_render_system.hpp"
 #include "Core/keyboard_movement_controller.hpp"
 
 // libs

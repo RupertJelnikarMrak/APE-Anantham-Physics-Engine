@@ -1,4 +1,4 @@
-#include "Core/Systems/simple_render_system.hpp"
+#include "Core/System/simple_render_system.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS
