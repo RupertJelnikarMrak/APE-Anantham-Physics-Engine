@@ -1,18 +1,20 @@
 #pragma once
 
+// lib
+#include <entt/entity/fwd.hpp>
 #include <entt/entt.hpp>
+#include <entt/signal/fwd.hpp>
 
-namespace Core
+namespace Core::Scene
 {
 
 class Scene
 {
-public:
-    Scene();
-    ~Scene();
-
 private:
-    entt::registry m_Registry;
+    entt::registry _registry;
+    entt::dispatcher _dispatcher;
+
+    entt::entity _cameraEntity;
 };
 
-} // namespace Core
+} // namespace Core::Scene

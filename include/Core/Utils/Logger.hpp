@@ -8,7 +8,7 @@
 
 #include <spdlog/spdlog.h>
 
-namespace Core
+namespace Core::Utils
 {
 
 class Logger
@@ -24,4 +24,4 @@ public:
     ~Logger() = delete;
 };
 
-} // namespace Core
+} // namespace Core::Utils

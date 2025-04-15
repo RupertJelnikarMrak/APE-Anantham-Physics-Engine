@@ -1,4 +1,4 @@
-#include "Core/Logger.hpp"
+#include "Core/Utils/Logger.hpp"
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
@@ -12,7 +12,7 @@
 #include <ctime>
 #include <memory>
 
-namespace Core
+namespace Core::Utils
 {
 
 void Logger::init()
@@ -50,4 +50,4 @@ void Logger::init()
     // SPDLOG_ERROR("This is an error message");
 }
 
-} // namespace Core
+} // namespace Core::Utils
