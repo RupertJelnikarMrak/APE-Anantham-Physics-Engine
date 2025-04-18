@@ -1,4 +1,5 @@
 #include "Core/Rendering/Descriptors.hpp"
+#include "Core/Rendering/GraphicsDevice.hpp"
 
 // std
 #include <cassert>
@@ -32,7 +33,7 @@ std::unique_ptr<DescriptorSetLayout> DescriptorSetLayout::Builder::build() const
 // *************** Descriptor Set Layout *********************
 
 DescriptorSetLayout::DescriptorSetLayout(
-    Device &lveDevice,
+    GraphicsDevice &lveDevice,
     std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
     : _device{lveDevice}, _bindings{bindings}
 {
@@ -84,7 +85,7 @@ std::unique_ptr<DescriptorPool> DescriptorPool::Builder::build() const
 // *************** Descriptor Pool *********************
 
 DescriptorPool::DescriptorPool(
-    Device &lveDevice,
+    GraphicsDevice &lveDevice,
     uint32_t maxSets,
     VkDescriptorPoolCreateFlags poolFlags,
     const std::vector<VkDescriptorPoolSize> &poolSizes)

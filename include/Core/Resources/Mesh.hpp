@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Core/Rendering/Buffer.hpp"
-#include "Core/Rendering/Device.hpp"
-#include <cstdint>
+#include "Core/Rendering/GraphicsDevice.hpp"
 
 // lib
 #define GLM_FORCE_RADIANS
@@ -10,13 +9,14 @@
 #include <glm/glm.hpp>
 
 // std
+#include <cstdint>
 #include <memory>
 #include <string>
 
-namespace Core::Rendering
+namespace Core::Resources
 {
 
-class Model
+class Mesh
 {
 public:
     struct Vertex {
@@ -34,35 +34,31 @@ public:
         }
     };
 
-    struct Builder {
+    struct RawMesh {
         std::vector<Vertex> vertices{};
         std::vector<uint32_t> indices{};
 
-        void loadModel(const std::string &filePath);
+        void loadMesh(const std::string &filePath);
     };
 
-    Model(Device &device, const Builder &builder);
-    ~Model();
+    Mesh(Rendering::GraphicsDevice &device, const RawMesh &rawMesh);
+    ~Mesh();
 
-    Model(const Model &) = delete;
-    Model &operator=(const Model &) = delete;
-
-    static std::unique_ptr<Model> createModelFromFile(Device &device, const std::string &filePath);
+    static std::shared_ptr<Mesh> createMeshFromFile(Rendering::GraphicsDevice &device, const std::string &filepath);
 
     void bind(VkCommandBuffer commandBuffer);
     void draw(VkCommandBuffer commandBuffer);
 
 private:
-    void createVertexBuffers(const std::vector<Vertex> &vertices);
-    void createIndexBuffers(const std::vector<uint32_t> &indices);
+    void createVertexBuffers(const std::vector<Vertex> &vertices, Rendering::GraphicsDevice &device);
+    void createIndexBuffers(const std::vector<uint32_t> &indices, Rendering::GraphicsDevice &device);
 
-    Device &_device;
-    std::unique_ptr<Buffer> _vertexBuffer;
+    std::unique_ptr<Rendering::Buffer> _vertexBuffer;
     uint32_t _vertexCount;
 
-    bool hasIndexBuffer = false;
-    std::unique_ptr<Buffer> _indexBuffer;
+    bool _hasIndexBuffer = false;
+    std::unique_ptr<Rendering::Buffer> _indexBuffer;
     uint32_t _indexCount;
 };
 
-} // namespace Core::Rendering
+} // namespace Core::Resources

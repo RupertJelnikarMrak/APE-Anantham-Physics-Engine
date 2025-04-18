@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <string>
 
-namespace Core
+namespace Core::Platform
 {
 
 class Window
@@ -40,4 +40,4 @@ private:
     GLFWwindow *_window;
 };
 
-} // namespace Core
+} // namespace Core::Platform

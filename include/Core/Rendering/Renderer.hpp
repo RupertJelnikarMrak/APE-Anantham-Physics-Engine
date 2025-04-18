@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Core/Rendering/Device.hpp"
+#include "Core/Platform/Window.hpp"
+#include "Core/Rendering/GraphicsDevice.hpp"
 #include "Core/Rendering/SwapChain.hpp"
-#include "Core/Window.hpp"
 
 // std
 #include <cassert>
@@ -15,7 +15,7 @@ namespace Core::Rendering
 class Renderer
 {
 public:
-    Renderer(Window &window, Device &device);
+    Renderer(Platform::Window &window, GraphicsDevice &device);
     ~Renderer();
 
     Renderer(const Renderer &) = delete;
@@ -47,8 +47,8 @@ private:
     void freeCommandBuffers();
     void recreateSwapChain();
 
-    Window &_lveWindow;
-    Device &_lveDevice;
+    Platform::Window &_lveWindow;
+    GraphicsDevice &_lveDevice;
     std::unique_ptr<SwapChain> _lveSwapChain;
     std::vector<VkCommandBuffer> _commandBuffers;
 

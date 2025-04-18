@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Rendering/Device.hpp"
+#include "Core/Rendering/GraphicsDevice.hpp"
 
 // std
 #include <memory>
@@ -16,7 +16,7 @@ public:
     class Builder
     {
     public:
-        Builder(Device &lveDevice) : _device{lveDevice} {}
+        Builder(GraphicsDevice &lveDevice) : _device{lveDevice} {}
 
         Builder &addBinding(
             uint32_t binding,
@@ -26,11 +26,11 @@ public:
         std::unique_ptr<DescriptorSetLayout> build() const;
 
     private:
-        Device &_device;
+        GraphicsDevice &_device;
         std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> _bindings{};
     };
 
-    DescriptorSetLayout(Device &lveDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
+    DescriptorSetLayout(GraphicsDevice &lveDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
     ~DescriptorSetLayout();
     DescriptorSetLayout(const DescriptorSetLayout &) = delete;
     DescriptorSetLayout &operator=(const DescriptorSetLayout &) = delete;
@@ -38,7 +38,7 @@ public:
     VkDescriptorSetLayout getDescriptorSetLayout() const { return _descriptorSetLayout; }
 
 private:
-    Device &_device;
+    GraphicsDevice &_device;
     VkDescriptorSetLayout _descriptorSetLayout;
     std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> _bindings;
 
@@ -51,7 +51,7 @@ public:
     class Builder
     {
     public:
-        Builder(Device &lveDevice) : _device{lveDevice} {}
+        Builder(GraphicsDevice &lveDevice) : _device{lveDevice} {}
 
         Builder &addPoolSize(VkDescriptorType descriptorType, uint32_t count);
         Builder &setPoolFlags(VkDescriptorPoolCreateFlags flags);
@@ -59,14 +59,14 @@ public:
         std::unique_ptr<DescriptorPool> build() const;
 
     private:
-        Device &_device;
+        GraphicsDevice &_device;
         std::vector<VkDescriptorPoolSize> _poolSizes{};
         uint32_t _maxSets = 1000;
         VkDescriptorPoolCreateFlags _poolFlags = 0;
     };
 
     DescriptorPool(
-        Device &lveDevice,
+        GraphicsDevice &lveDevice,
         uint32_t maxSets,
         VkDescriptorPoolCreateFlags poolFlags,
         const std::vector<VkDescriptorPoolSize> &poolSizes);
@@ -81,7 +81,7 @@ public:
     void resetPool();
 
 private:
-    Device &_device;
+    GraphicsDevice &_device;
     VkDescriptorPool _descriptorPool;
 
     friend class DescriptorWriter;

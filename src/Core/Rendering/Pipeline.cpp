@@ -1,6 +1,7 @@
 #include "Core/Rendering/Pipeline.hpp"
 
-#include "Core/Rendering/Model.hpp"
+#include "Core/Rendering/GraphicsDevice.hpp"
+#include "Core/Resources/Mesh.hpp"
 
 // std
 #include <cassert>
@@ -16,7 +17,7 @@ namespace Core::Rendering
 {
 
 Pipeline::Pipeline(
-    Device &device,
+    GraphicsDevice &device,
     const std::string &vertFilepath,
     const std::string &fragFilepath,
     const PipelineConfigInfo &configInfo)
@@ -206,8 +207,8 @@ void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo &configInfo)
     configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
     configInfo.dynamicStateInfo.flags = 0;
 
-    configInfo.bindingDescriptions = Model::Vertex::getBindingDescriptions();
-    configInfo.attributeDescriptions = Model::Vertex::getAttributeDescriptions();
+    configInfo.bindingDescriptions = Resources::Mesh::Vertex::getBindingDescriptions();
+    configInfo.attributeDescriptions = Resources::Mesh::Vertex::getAttributeDescriptions();
 }
 
 void Pipeline::enableAlphaBlending(PipelineConfigInfo &configInfo)

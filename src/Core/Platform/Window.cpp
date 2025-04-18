@@ -1,4 +1,4 @@
-#include "Core/Window.hpp"
+#include "Core/Platform/Window.hpp"
 
 // lib
 #include <GLFW/glfw3.h>
@@ -6,7 +6,7 @@
 // std
 #include <stdexcept>
 
-namespace Core
+namespace Core::Platform
 {
 
 Window::Window(int w, int h, std::string name) : _width(w), _height(h), _windowName(name) { initWindow(); }
@@ -43,4 +43,4 @@ void Window::framebufferResizeCallback(GLFWwindow *_window, int width, int heigh
     app->_height = height;
 }
 
-} // namespace Core
+} // namespace Core::Platform

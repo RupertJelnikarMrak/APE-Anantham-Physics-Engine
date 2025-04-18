@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Rendering/Device.hpp"
+#include "Core/Rendering/GraphicsDevice.hpp"
 
 // std
 #include <string>
@@ -36,7 +36,7 @@ class Pipeline
 
 public:
     Pipeline(
-        Device &device,
+        GraphicsDevice &device,
         const std::string &vertFilepath,
         const std::string &fragFilepath,
         const PipelineConfigInfo &configInfo);
@@ -60,7 +60,7 @@ private:
 
     void createShaderModule(const std::vector<char> &code, VkShaderModule *shaderModule);
 
-    Device &_device;
+    GraphicsDevice &_device;
     VkPipeline _graphicsPipeline;
     VkShaderModule _vertShaderModule;
     VkShaderModule _fragShaderModule;

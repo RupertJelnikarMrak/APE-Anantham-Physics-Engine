@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Rendering/Device.hpp"
+#include "Core/Rendering/GraphicsDevice.hpp"
 #include <vulkan/vulkan_core.h>
 
 namespace Core::Rendering
@@ -10,7 +10,7 @@ class Buffer
 {
 public:
     Buffer(
-        Device &device,
+        GraphicsDevice &device,
         VkDeviceSize instanceSize,
         uint32_t instanceCount,
         VkBufferUsageFlags usageFlags,
@@ -45,7 +45,7 @@ public:
 private:
     static VkDeviceSize getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment);
 
-    Device &_device;
+    GraphicsDevice &_device;
     void *_mapped = nullptr;
     VkBuffer _buffer = VK_NULL_HANDLE;
     VkDeviceMemory _memory = VK_NULL_HANDLE;

@@ -1,9 +1,10 @@
 #pragma once
 
+#include "Core/Input/InputController.hpp"
 #include "Core/Rendering/Camera.hpp"
-#include "Core/Rendering/GameObject.hpp"
 
 // lib
+#include <entt/entity/fwd.hpp>
 #include <vulkan/vulkan.h>
 
 namespace Core::Rendering
@@ -11,7 +12,7 @@ namespace Core::Rendering
 
 #define MAX_LIGHTS 10
 
-struct PointLight {
+struct PointLightUniform {
     glm::vec4 position{}; // ignore w
     glm::vec4 color{};    // w is intensity
 };
@@ -21,7 +22,7 @@ struct GlobalUbo {
     glm::mat4 view{1.f};
     glm::mat4 inverseView{1.f};
     glm::vec4 ambientLightColor{1.f, 1.f, 1.f, .02f}; // w is intensity
-    PointLight pointLights[MAX_LIGHTS];
+    PointLightUniform pointLights[MAX_LIGHTS];
     int numLights;
 };
 
@@ -31,6 +32,7 @@ struct FrameInfo {
     VkCommandBuffer commandBuffer;
     Camera &camera;
     VkDescriptorSet globalDescriptorSet;
-    GameObject::Map &gameObjects;
+    entt::registry &registry;
+    Input::InputController &inputController;
 };
 } // namespace Core::Rendering

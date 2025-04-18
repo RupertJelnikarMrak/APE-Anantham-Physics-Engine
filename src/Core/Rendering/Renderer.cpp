@@ -8,7 +8,7 @@
 namespace Core::Rendering
 {
 
-Renderer::Renderer(Window &window, Device &device) : _lveWindow{window}, _lveDevice{device}
+Renderer::Renderer(Platform::Window &window, GraphicsDevice &device) : _lveWindow{window}, _lveDevice{device}
 {
     recreateSwapChain();
     createCommandBuffers();

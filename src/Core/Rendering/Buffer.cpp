@@ -7,7 +7,7 @@
 
 #include "Core/Rendering/Buffer.hpp"
 
-#include "Core/Rendering/Device.hpp"
+#include "Core/Rendering/GraphicsDevice.hpp"
 
 // std
 #include <cassert>
@@ -35,7 +35,7 @@ VkDeviceSize Buffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOff
 }
 
 Buffer::Buffer(
-    Device &device,
+    GraphicsDevice &device,
     VkDeviceSize instanceSize,
     uint32_t instanceCount,
     VkBufferUsageFlags usageFlags,

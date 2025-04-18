@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Rendering/Device.hpp"
+#include "Core/Rendering/GraphicsDevice.hpp"
 
 // vulkan headers
 #include <vulkan/vulkan.h>
@@ -17,8 +17,8 @@ class SwapChain
 public:
     static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-    SwapChain(Device &deviceRef, VkExtent2D windowExtent);
-    SwapChain(Device &deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previous);
+    SwapChain(GraphicsDevice &deviceRef, VkExtent2D windowExtent);
+    SwapChain(GraphicsDevice &deviceRef, VkExtent2D windowExtent, std::shared_ptr<SwapChain> previous);
 
     ~SwapChain();
 
@@ -76,7 +76,7 @@ private:
     std::vector<VkImage> _swapChainImages;
     std::vector<VkImageView> _swapChainImageViews;
 
-    Device &_device;
+    GraphicsDevice &_device;
     VkExtent2D _windowExtent;
 
     VkSwapchainKHR _swapChain;

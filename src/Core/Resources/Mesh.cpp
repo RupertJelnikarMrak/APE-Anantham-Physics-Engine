@@ -1,5 +1,6 @@
-#include "Core/Rendering/Model.hpp"
+#include "Core/Resources/Mesh.hpp"
 
+#include "Core/Rendering/GraphicsDevice.hpp"
 #include "Core/Utils/Utils.hpp"
 
 // libs
@@ -18,8 +19,8 @@
 
 namespace std
 {
-template <> struct hash<Core::Rendering::Model::Vertex> {
-    size_t operator()(Core::Rendering::Model::Vertex const &vertex) const
+template <> struct hash<Core::Resources::Mesh::Vertex> {
+    size_t operator()(Core::Resources::Mesh::Vertex const &vertex) const
     {
         size_t seed = 0;
         Core::Utils::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
@@ -28,33 +29,33 @@ template <> struct hash<Core::Rendering::Model::Vertex> {
 };
 } // namespace std
 
-namespace Core::Rendering
+namespace Core::Resources
 {
 
-Model::Model(Device &device, const Model::Builder &builder) : _device{device}
+Mesh::Mesh(Rendering::GraphicsDevice &device, const Mesh::RawMesh &builder)
 {
-    createVertexBuffers(builder.vertices);
-    createIndexBuffers(builder.indices);
+    createVertexBuffers(builder.vertices, device);
+    createIndexBuffers(builder.indices, device);
 }
 
-Model::~Model() {}
+Mesh::~Mesh() {}
 
-std::unique_ptr<Model> Model::createModelFromFile(Device &device, const std::string &filepath)
+std::shared_ptr<Mesh> Mesh::createMeshFromFile(Rendering::GraphicsDevice &device, const std::string &filepath)
 {
-    Builder builder{};
-    builder.loadModel(ENGINE_DIR + filepath);
-    return std::make_unique<Model>(device, builder);
+    RawMesh rawMesh{};
+    rawMesh.loadMesh(ENGINE_DIR + filepath);
+    return std::make_shared<Mesh>(device, rawMesh);
 }
 
-void Model::createVertexBuffers(const std::vector<Vertex> &vertices)
+void Mesh::createVertexBuffers(const std::vector<Vertex> &vertices, Rendering::GraphicsDevice &device)
 {
     _vertexCount = static_cast<uint32_t>(vertices.size());
     assert(_vertexCount >= 3 && "Vertex count must be at least 3");
     VkDeviceSize bufferSize = sizeof(vertices[0]) * _vertexCount;
     uint32_t vertexSize = sizeof(vertices[0]);
 
-    Buffer stagingBuffer{
-        _device,
+    Rendering::Buffer stagingBuffer{
+        device,
         vertexSize,
         _vertexCount,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -64,30 +65,30 @@ void Model::createVertexBuffers(const std::vector<Vertex> &vertices)
     stagingBuffer.map();
     stagingBuffer.writeToBuffer((void *)vertices.data());
 
-    _vertexBuffer = std::make_unique<Buffer>(
-        _device,
+    _vertexBuffer = std::make_unique<Rendering::Buffer>(
+        device,
         vertexSize,
         _vertexCount,
         VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    _device.copyBuffer(stagingBuffer.getBuffer(), _vertexBuffer->getBuffer(), bufferSize);
+    device.copyBuffer(stagingBuffer.getBuffer(), _vertexBuffer->getBuffer(), bufferSize);
 }
 
-void Model::createIndexBuffers(const std::vector<uint32_t> &indices)
+void Mesh::createIndexBuffers(const std::vector<uint32_t> &indices, Rendering::GraphicsDevice &device)
 {
     _indexCount = static_cast<uint32_t>(indices.size());
-    hasIndexBuffer = _indexCount > 0;
+    _hasIndexBuffer = _indexCount > 0;
 
-    if (!hasIndexBuffer) {
+    if (!_hasIndexBuffer) {
         return;
     }
 
     VkDeviceSize bufferSize = sizeof(indices[0]) * _indexCount;
     uint32_t indexSize = sizeof(indices[0]);
 
-    Buffer stagingBuffer{
-        _device,
+    Rendering::Buffer stagingBuffer{
+        device,
         indexSize,
         _indexCount,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -97,37 +98,37 @@ void Model::createIndexBuffers(const std::vector<uint32_t> &indices)
     stagingBuffer.map();
     stagingBuffer.writeToBuffer((void *)indices.data());
 
-    _indexBuffer = std::make_unique<Buffer>(
-        _device,
+    _indexBuffer = std::make_unique<Rendering::Buffer>(
+        device,
         indexSize,
         _indexCount,
         VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    _device.copyBuffer(stagingBuffer.getBuffer(), _indexBuffer->getBuffer(), bufferSize);
+    device.copyBuffer(stagingBuffer.getBuffer(), _indexBuffer->getBuffer(), bufferSize);
 }
 
-void Model::draw(VkCommandBuffer commandBuffer)
+void Mesh::draw(VkCommandBuffer commandBuffer)
 {
-    if (hasIndexBuffer) {
+    if (_hasIndexBuffer) {
         vkCmdDrawIndexed(commandBuffer, _indexCount, 1, 0, 0, 0);
     } else {
         vkCmdDraw(commandBuffer, _vertexCount, 1, 0, 0);
     }
 }
 
-void Model::bind(VkCommandBuffer commandBuffer)
+void Mesh::bind(VkCommandBuffer commandBuffer)
 {
     VkBuffer buffers[] = {_vertexBuffer->getBuffer()};
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
 
-    if (hasIndexBuffer) {
+    if (_hasIndexBuffer) {
         vkCmdBindIndexBuffer(commandBuffer, _indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
     }
 }
 
-std::vector<VkVertexInputBindingDescription> Model::Vertex::getBindingDescriptions()
+std::vector<VkVertexInputBindingDescription> Mesh::Vertex::getBindingDescriptions()
 {
     std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);
     bindingDescriptions[0].binding = 0;
@@ -136,7 +137,7 @@ std::vector<VkVertexInputBindingDescription> Model::Vertex::getBindingDescriptio
     return bindingDescriptions;
 }
 
-std::vector<VkVertexInputAttributeDescription> Model::Vertex::getAttributeDescriptions()
+std::vector<VkVertexInputAttributeDescription> Mesh::Vertex::getAttributeDescriptions()
 {
     std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
 
@@ -148,7 +149,7 @@ std::vector<VkVertexInputAttributeDescription> Model::Vertex::getAttributeDescri
     return attributeDescriptions;
 }
 
-void Model::Builder::loadModel(const std::string &filepath)
+void Mesh::RawMesh::loadMesh(const std::string &filepath)
 {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -205,4 +206,4 @@ void Model::Builder::loadModel(const std::string &filepath)
     }
 }
 
-} // namespace Core::Rendering
+} // namespace Core::Resources

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Window.hpp"
+#include "Core/Platform/Window.hpp"
 
 // lib
 #include <vulkan/vulkan_core.h>
@@ -26,7 +26,7 @@ struct QueueFamilyIndices {
     bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
 };
 
-class Device
+class GraphicsDevice
 {
 public:
 #ifdef NDEBUG
@@ -35,13 +35,13 @@ public:
     const bool enableValidationLayers = true;
 #endif
 
-    Device(Core::Window &window);
-    ~Device();
+    GraphicsDevice(Platform::Window &window);
+    ~GraphicsDevice();
 
-    Device(const Device &) = delete;
-    Device &operator=(const Device &) = delete;
-    Device(Device &&) = delete;
-    Device &operator=(Device &&) = delete;
+    GraphicsDevice(const GraphicsDevice &) = delete;
+    GraphicsDevice &operator=(const GraphicsDevice &) = delete;
+    GraphicsDevice(GraphicsDevice &&) = delete;
+    GraphicsDevice &operator=(GraphicsDevice &&) = delete;
 
     VkCommandPool getCommandPool() { return _commandPool; }
     VkDevice getDevice() { return _device; }
@@ -94,7 +94,7 @@ private:
     VkInstance _instance;
     VkDebugUtilsMessengerEXT _debugMessenger;
     VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
-    Core::Window &_window;
+    Platform::Window &_window;
     VkCommandPool _commandPool;
 
     VkDevice _device;

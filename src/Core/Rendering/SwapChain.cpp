@@ -1,4 +1,5 @@
 #include "Core/Rendering/SwapChain.hpp"
+#include "Core/Rendering/GraphicsDevice.hpp"
 
 // std
 #include <array>
@@ -11,9 +12,12 @@
 namespace Core::Rendering
 {
 
-SwapChain::SwapChain(Device &deviceRef, VkExtent2D extent) : _device{deviceRef}, _windowExtent{extent} { init(); }
+SwapChain::SwapChain(GraphicsDevice &deviceRef, VkExtent2D extent) : _device{deviceRef}, _windowExtent{extent}
+{
+    init();
+}
 
-SwapChain::SwapChain(Device &deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous)
+SwapChain::SwapChain(GraphicsDevice &deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous)
     : _device{deviceRef}, _windowExtent{extent}, _oldSwapChain{previous}
 {
     init();
