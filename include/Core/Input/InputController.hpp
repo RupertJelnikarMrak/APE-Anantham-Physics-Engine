@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Core/Platform/Window.hpp>
 #include <GLFW/glfw3.h>
 
 #include <string>
@@ -18,12 +19,17 @@ public:
      * @brief Constructor.
      * @param window A shared pointer to the GLFW window.
      */
-    InputController(GLFWwindow *window);
+    InputController(Platform::Window &);
 
     /**
      * @brief Destructor. Resets GLFW user pointer.
      */
-    ~InputController();
+    ~InputController() = default;
+
+    InputController(const InputController &) = delete;
+    InputController &operator=(const InputController &) = delete;
+    InputController(InputController &&) = delete;
+    InputController &operator=(InputController &&) = delete;
 
     /**
      * @brief Binds a specific keyboard key to a named action.
@@ -123,45 +129,35 @@ public:
      */
     void update();
 
+    friend class Platform::Window;
+
 private:
-    // --- GLFW Callback Handlers (Member Functions) ---
+    Platform::Window &_window;
+
     void handleKeyEvent(int key, int scancode, int action, int mods);
     void handleMouseButtonEvent(int button, int action, int mods);
     void handleCursorPosEvent(double xpos, double ypos);
     void handleScrollEvent(double xoffset, double yoffset);
 
-    // --- Static GLFW Callbacks (Required for the C base GLFW API) ---
-    static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
-    static void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
-    static void CursorPosCallback(GLFWwindow *window, double xpos, double ypos);
-    static void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset);
-
-    // --- Member Variables ---
-    GLFWwindow *_window;
-
-    // Action bindings
     ActionKeyMap _keyBindings;
     ActionKeyMap _mouseButtonBindings;
     ActionKeyMap _defaultKeyBindings;
     ActionKeyMap _defaultMouseButtonBindings;
 
-    // Input states
     std::unordered_map<int, bool> _currentKeyStates;
     std::unordered_map<int, bool> _previousKeyStates;
     std::unordered_map<int, bool> _currentMouseButtonStates;
     std::unordered_map<int, bool> _previousMouseButtonStates;
 
-    // Cursor state
     double _cursorX = 0.0;
     double _cursorY = 0.0;
     double _previousCursorX = 0.0;
     double _previousCursorY = 0.0;
 
-    // Scroll state
-    double _scrollX = 0.0;         // Total accumulated scroll X
-    double _scrollY = 0.0;         // Total accumulated scroll Y
-    double _previousScrollX = 0.0; // Previous total scroll X (for calculating delta if needed differently)
-    double _previousScrollY = 0.0; // Previous total scroll Y (for calculating delta if needed differently)
+    double _scrollX = 0.0;
+    double _scrollY = 0.0;
+    double _previousScrollX = 0.0;
+    double _previousScrollY = 0.0;
 };
 
 } // namespace Core::Input

@@ -2,7 +2,6 @@
 
 #include "Core/Ecs/Systems/CameraSystem.hpp"
 #include "Core/Ecs/Systems/MeshRenderSystem.hpp"
-#include "Core/Ecs/Systems/PointLightRenderSystem.hpp"
 #include "Core/Input/InputController.hpp"
 #include "Core/Rendering/Buffer.hpp"
 #include "Core/Rendering/Descriptors.hpp"
@@ -37,7 +36,7 @@ private:
     Rendering::GraphicsDevice &_device;
     Rendering::Renderer &_renderer;
     Platform::Window &_window;
-    Input::InputController _inputController{_window.getGLFWwindow()};
+    Input::InputController _inputController{_window};
     Resources::ResourceManager _resourceManager{_device};
 
     std::unique_ptr<Core::Rendering::DescriptorPool> _globalPool{};
@@ -48,7 +47,6 @@ private:
 
     std::unique_ptr<Systems::CameraSystem> _cameraSystem;
     std::unique_ptr<Systems::MeshRenderSystem> _meshRenderSystem;
-    std::unique_ptr<Systems::PointLightRenderSystem> _pointLightRenderSystem;
 };
 
 } // namespace Core::Ecs::Scenes

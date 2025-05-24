@@ -3,7 +3,7 @@
 // std
 #include <functional>
 
-namespace Core::Utils
+namespace Core::Utils::Math
 {
 
 template <typename T, typename... Rest> void hashCombine(std::size_t &seed, const T &v, Rest &...rest)
@@ -12,4 +12,4 @@ template <typename T, typename... Rest> void hashCombine(std::size_t &seed, cons
     (hashCombine(seed, rest), ...);
 }
 
-} // namespace Core::Utils
+} // namespace Core::Utils::Math

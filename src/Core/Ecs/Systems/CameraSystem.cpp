@@ -4,12 +4,15 @@
 #include "Core/Rendering/FrameInfo.hpp"
 
 #include <GLFW/glfw3.h>
+#include <algorithm>
 #include <entt/entt.hpp>
 #include <glm/gtc/constants.hpp>
 #include <spdlog/spdlog.h>
 
 namespace Core::Ecs::Systems
 {
+
+#define MOUSE_SENSITIVITY 0.001f
 
 CameraSystem::CameraSystem(Rendering::Camera &camera, Input::InputController &input, Rendering::Renderer &renderer)
     : _camera(camera), _input(input), _renderer(renderer)
@@ -38,16 +41,37 @@ void CameraSystem::update(Rendering::FrameInfo &frameInfo)
 
     // Handle camera movement
 
+    double scrollDeltaY = _input.getScrollDeltaY();
+    if (std::abs(scrollDeltaY) > std::numeric_limits<double>::epsilon()) {
+        const float speedChangeFactor = 0.1f;
+
+        float speedStep = cameraComponent.moveSpeed * speedChangeFactor;
+
+        const float minSpeedStep = 0.05f;
+        speedStep = std::max(speedStep, minSpeedStep);
+
+        if (scrollDeltaY > 0) {
+            cameraComponent.moveSpeed += speedStep;
+        } else {
+            cameraComponent.moveSpeed -= speedStep;
+        }
+
+        cameraComponent.moveSpeed = std::clamp(cameraComponent.moveSpeed, .1f, 100.f);
+    }
+
     if (_input.isActionPressed("CameraLookAround"))
         _input.setCursorMode(GLFW_CURSOR_DISABLED);
-
-    if (_input.isActionReleased("CameraLookAround"))
+    else if (_input.isActionReleased("CameraLookAround"))
         _input.setCursorMode(GLFW_CURSOR_NORMAL);
 
     glm::vec3 rotate{0};
-    if (_input.isActionDown("cameraLookAround")) {
-        rotate.x = _input.getCursorDeltaX();
-        rotate.y = _input.getCursorDeltaY();
+    if (_input.isActionDown("CameraLookAround")) {
+        rotate.y += _input.getCursorDeltaX();
+        rotate.x -= _input.getCursorDeltaY();
+
+        if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) {
+            cameraTransform.rotation += cameraComponent.lookSpeed * MOUSE_SENSITIVITY * rotate;
+        }
     } else {
         if (_input.isActionDown("CameraLookRight"))
             rotate.y += 1.f;
@@ -57,10 +81,10 @@ void CameraSystem::update(Rendering::FrameInfo &frameInfo)
             rotate.x += 1.f;
         if (_input.isActionDown("CameraLookDown"))
             rotate.x -= 1.f;
-    }
 
-    if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) {
-        cameraTransform.rotation += cameraComponent.lookSpeed * frameInfo.frameTime * glm::normalize(rotate);
+        if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) {
+            cameraTransform.rotation += cameraComponent.lookSpeed * frameInfo.frameTime * glm::normalize(rotate);
+        }
     }
 
     // limit pitch values between about +/- 85ish degrees
@@ -105,8 +129,10 @@ void CameraSystem::setupControls()
     _input.bindKeyToAction("CameraLookUp", GLFW_KEY_UP);
     _input.bindKeyToAction("CameraLookDown", GLFW_KEY_DOWN);
     _input.bindKeyToAction("CameraLookLeft", GLFW_KEY_LEFT);
+    _input.bindKeyToAction("CameraLookLeft", GLFW_KEY_Q);
     _input.bindKeyToAction("CameraLookRight", GLFW_KEY_RIGHT);
-    _input.bindKeyToAction("cameraLookAround", GLFW_MOUSE_BUTTON_1);
+    _input.bindKeyToAction("CameraLookRight", GLFW_KEY_E);
+    _input.bindMouseButtonToAction("CameraLookAround", GLFW_MOUSE_BUTTON_2);
 }
 
 } // namespace Core::Ecs::Systems

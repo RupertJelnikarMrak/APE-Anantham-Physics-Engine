@@ -2,6 +2,7 @@
 
 // std
 #include <cassert>
+#include <glm/matrix.hpp>
 
 namespace Core::Rendering
 {
@@ -27,6 +28,8 @@ void Camera::setPerspectiveProjection(float fovy, float aspect, float near, floa
     _projectionMatrix[2][2] = far / (far - near);
     _projectionMatrix[2][3] = 1.f;
     _projectionMatrix[3][2] = -(far * near) / (far - near);
+
+    _inverseProjectionMatrix = glm::inverse(_projectionMatrix);
 }
 
 void Camera::setViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up)

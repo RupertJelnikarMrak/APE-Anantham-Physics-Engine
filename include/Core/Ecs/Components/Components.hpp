@@ -17,20 +17,16 @@ struct Mesh {
     std::string meshName;
 };
 
-struct PointLight {
-    glm::vec3 color{};
-    glm::vec3 position{};
-    float intensity = 1.f;
-    float radius = .1f;
-};
-
 struct Camera {
     bool active = false;
     float fov = glm::radians(45.f);
     float near = 0.1f;
     float far = 100.f;
     float lookSpeed = 1.f;
-    float moveSpeed = 1.f;
+    float moveSpeed = 2.f;
+};
+
+struct Selected {
 };
 
 } // namespace Core::Ecs::Components

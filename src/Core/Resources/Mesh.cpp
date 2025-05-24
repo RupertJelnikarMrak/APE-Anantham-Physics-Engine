@@ -1,7 +1,7 @@
 #include "Core/Resources/Mesh.hpp"
 
 #include "Core/Rendering/GraphicsDevice.hpp"
-#include "Core/Utils/Utils.hpp"
+#include "Core/Utils/Math/HashCombine.hpp"
 
 // libs
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -23,7 +23,7 @@ template <> struct hash<Core::Resources::Mesh::Vertex> {
     size_t operator()(Core::Resources::Mesh::Vertex const &vertex) const
     {
         size_t seed = 0;
-        Core::Utils::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
+        Core::Utils::Math::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
         return seed;
     }
 };
@@ -32,7 +32,7 @@ template <> struct hash<Core::Resources::Mesh::Vertex> {
 namespace Core::Resources
 {
 
-Mesh::Mesh(Rendering::GraphicsDevice &device, const Mesh::RawMesh &builder)
+Mesh::Mesh(Rendering::GraphicsDevice &device, const Mesh::RawMesh &builder) : _rawMesh(builder)
 {
     createVertexBuffers(builder.vertices, device);
     createIndexBuffers(builder.indices, device);

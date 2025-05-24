@@ -19,6 +19,8 @@ namespace Core::Ecs::Scenes
 Scene::Scene(Rendering::GraphicsDevice &device, Rendering::Renderer &renderer, Platform::Window &window)
     : _device{device}, _renderer{renderer}, _window{window}
 {
+    _window.setInputController(&_inputController);
+
     _globalPool = Core::Rendering::DescriptorPool::Builder(_device)
                       .setMaxSets(Core::Rendering::SwapChain::MAX_FRAMES_IN_FLIGHT)
                       .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, Core::Rendering::SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -70,13 +72,12 @@ void Scene::drawFrame(float frameTime)
         ubo.projection = _camera.getProjection();
         ubo.view = _camera.getView();
         ubo.inverseView = _camera.getInverseView();
-        _pointLightRenderSystem->update(frameInfo, ubo);
+        ubo.directionalLightColor = {.8f, .9f, 1.f, 1.f};
         _uboBuffers[frameIndex]->writeToBuffer(&ubo);
         _uboBuffers[frameIndex]->flush();
 
         _renderer.beginSwapChainRenderPass(commandBuffer);
 
-        _pointLightRenderSystem->render(frameInfo, ubo);
         _meshRenderSystem->render(frameInfo);
 
         _renderer.endSwapChainRenderPass(commandBuffer);
@@ -89,7 +90,6 @@ void Scene::createSystems(VkRenderPass renderPass, VkDescriptorSetLayout globalS
     _cameraSystem = std::make_unique<Systems::CameraSystem>(_camera, _inputController, _renderer);
     _meshRenderSystem =
         std::make_unique<Systems::MeshRenderSystem>(_device, renderPass, globalSetLayout, _resourceManager);
-    _pointLightRenderSystem = std::make_unique<Systems::PointLightRenderSystem>(_device, renderPass, globalSetLayout);
 }
 
 void Scene::loadObjects()

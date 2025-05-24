@@ -4,16 +4,9 @@
 namespace Core::Input
 {
 
-InputController::InputController(GLFWwindow *window) : _window(window)
+InputController::InputController(Platform::Window &window) : _window(window)
 {
-    glfwSetWindowUserPointer(_window, this);
-
-    glfwSetKeyCallback(_window, KeyCallback);
-    glfwSetMouseButtonCallback(_window, MouseButtonCallback);
-    glfwSetCursorPosCallback(_window, CursorPosCallback);
-    glfwSetScrollCallback(_window, ScrollCallback);
-
-    glfwGetCursorPos(_window, &_cursorX, &_cursorY);
+    _window.getCursorPosition(_cursorX, _cursorY);
     _previousCursorX = _cursorX;
     _previousCursorY = _cursorY;
 
@@ -21,15 +14,6 @@ InputController::InputController(GLFWwindow *window) : _window(window)
     _scrollY = 0.0;
     _previousScrollX = 0.0;
     _previousScrollY = 0.0;
-}
-
-InputController::~InputController()
-{
-    if (_window) {
-        if (glfwGetWindowUserPointer(_window) == this) {
-            glfwSetWindowUserPointer(_window, nullptr);
-        }
-    }
 }
 
 void InputController::bindKeyToAction(const std::string &actionName, int key)
@@ -237,29 +221,22 @@ double InputController::getScrollDeltaX() const { return _scrollX - _previousScr
 
 double InputController::getScrollDeltaY() const { return _scrollY - _previousScrollY; }
 
-void InputController::setCursorPosition(double x, double y) { glfwSetCursorPos(_window, x, y); }
+void InputController::setCursorPosition(double x, double y) { _window.setCursorPosition(x, y); }
 
-void InputController::setCursorMode(int mode) { glfwSetInputMode(_window, GLFW_CURSOR, mode); }
+void InputController::setCursorMode(int mode) { _window.setCursorMode(mode); }
 
-void InputController::setCursorShape(int shape)
-{
-    GLFWcursor *cursor = glfwCreateStandardCursor(shape);
-    if (cursor) {
-        glfwSetCursor(_window, cursor);
-        glfwDestroyCursor(cursor);
-    }
-}
+void InputController::setCursorShape(int shape) { _window.setCursorShape(shape); }
 
 void InputController::update()
 {
-    glfwPollEvents();
-
     _previousKeyStates = _currentKeyStates;
     _previousMouseButtonStates = _currentMouseButtonStates;
     _previousCursorX = _cursorX;
     _previousCursorY = _cursorY;
     _previousScrollX = _scrollX;
     _previousScrollY = _scrollY;
+
+    glfwPollEvents();
 }
 
 void InputController::handleKeyEvent(int key, int scancode, int action, int mods)
@@ -290,38 +267,6 @@ void InputController::handleScrollEvent(double xoffset, double yoffset)
 {
     _scrollX += xoffset;
     _scrollY += yoffset;
-}
-
-void InputController::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
-{
-    InputController *controller = static_cast<InputController *>(glfwGetWindowUserPointer(window));
-    if (controller) {
-        controller->handleKeyEvent(key, scancode, action, mods);
-    }
-}
-
-void InputController::MouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
-{
-    InputController *controller = static_cast<InputController *>(glfwGetWindowUserPointer(window));
-    if (controller) {
-        controller->handleMouseButtonEvent(button, action, mods);
-    }
-}
-
-void InputController::CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
-{
-    InputController *controller = static_cast<InputController *>(glfwGetWindowUserPointer(window));
-    if (controller) {
-        controller->handleCursorPosEvent(xpos, ypos);
-    }
-}
-
-void InputController::ScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
-{
-    InputController *controller = static_cast<InputController *>(glfwGetWindowUserPointer(window));
-    if (controller) {
-        controller->handleScrollEvent(xoffset, yoffset);
-    }
 }
 
 } // namespace Core::Input

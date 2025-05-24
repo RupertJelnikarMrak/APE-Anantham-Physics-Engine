@@ -49,7 +49,11 @@ public:
     void bind(VkCommandBuffer commandBuffer);
     void draw(VkCommandBuffer commandBuffer);
 
+    const RawMesh &getRawMesh() const { return _rawMesh; }
+
 private:
+    const RawMesh &_rawMesh;
+
     void createVertexBuffers(const std::vector<Vertex> &vertices, Rendering::GraphicsDevice &device);
     void createIndexBuffers(const std::vector<uint32_t> &indices, Rendering::GraphicsDevice &device);
 
