@@ -3,17 +3,27 @@
 namespace Editor
 {
 
-void Editor::Run()
+void Editor::init() { _window.setInputController(_inputController); }
+
+void Editor::stop() {}
+
+void Editor::run()
 {
+    init();
     while (!_window.shouldClose()) {
-        Update();
-        Render();
+        update();
+        render();
         _window.resetResizedFlag();
     }
+    stop();
 }
 
-void Editor::Update() {}
+void Editor::update()
+{
+    _inputController->update();
+    _window.pollEvents();
+}
 
-void Editor::Render() {}
+void Editor::render() {}
 
 } // namespace Editor

@@ -16,14 +16,19 @@
 namespace Anantham::Ecs::Scenes
 {
 
-Scene::Scene(Rendering::GraphicsDevice &device, Rendering::Renderer &renderer, Platform::Window &window)
+Scene::Scene(
+    Rendering::GraphicsDevice &device,
+    Rendering::Renderer &renderer,
+    Platform::Window &window)
     : _device{device}, _renderer{renderer}, _window{window}
 {
-    _window.setInputController(&_inputController);
+    // _window.setInputController(&_inputController);
 
     _globalPool = Anantham::Rendering::DescriptorPool::Builder(_device)
                       .setMaxSets(Anantham::Rendering::SwapChain::MAX_FRAMES_IN_FLIGHT)
-                      .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, Anantham::Rendering::SwapChain::MAX_FRAMES_IN_FLIGHT)
+                      .addPoolSize(
+                          VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                          Anantham::Rendering::SwapChain::MAX_FRAMES_IN_FLIGHT)
                       .build();
 
     for (int i = 0; i < _uboBuffers.size(); i++) {
@@ -36,9 +41,10 @@ Scene::Scene(Rendering::GraphicsDevice &device, Rendering::Renderer &renderer, P
         _uboBuffers[i]->map();
     }
 
-    auto globalSetLayout = Rendering::DescriptorSetLayout::Builder(_device)
-                               .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
-                               .build();
+    auto globalSetLayout =
+        Rendering::DescriptorSetLayout::Builder(_device)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+            .build();
 
     for (int i = 0; i < _globalDescriptorSets.size(); i++) {
         auto bufferInfo = _uboBuffers[i]->descriptorInfo();
@@ -88,16 +94,25 @@ void Scene::drawFrame(float frameTime)
 void Scene::createSystems(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
 {
     _cameraSystem = std::make_unique<Systems::CameraSystem>(_camera, _inputController, _renderer);
-    _meshRenderSystem =
-        std::make_unique<Systems::MeshRenderSystem>(_device, renderPass, globalSetLayout, _resourceManager);
+    _meshRenderSystem = std::make_unique<Systems::MeshRenderSystem>(
+        _device,
+        renderPass,
+        globalSetLayout,
+        _resourceManager);
 }
 
 void Scene::loadObjects()
 {
     using namespace Resources;
-    _resourceManager.meshCache.put("SmoothVase", Mesh::createMeshFromFile(_device, "assets/models/smooth_vase.obj"));
-    _resourceManager.meshCache.put("Cube", Mesh::createMeshFromFile(_device, "assets/models/cube.obj"));
-    _resourceManager.meshCache.put("Quad", Mesh::createMeshFromFile(_device, "assets/models/quad.obj"));
+    _resourceManager.meshCache.put(
+        "SmoothVase",
+        Mesh::createMeshFromFile(_device, "assets/models/smooth_vase.obj"));
+    _resourceManager.meshCache.put(
+        "Cube",
+        Mesh::createMeshFromFile(_device, "assets/models/cube.obj"));
+    _resourceManager.meshCache.put(
+        "Quad",
+        Mesh::createMeshFromFile(_device, "assets/models/quad.obj"));
 
     auto entity = _registry.create();
     _registry.emplace<Components::Transform>(

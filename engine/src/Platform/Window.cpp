@@ -11,7 +11,10 @@
 namespace Anantham::Platform
 {
 
-Window::Window(int w, int h, std::string name) : _width(w), _height(h), _windowName(name) { initWindow(); }
+Window::Window(int w, int h, std::string name) : _width(w), _height(h), _windowName(name)
+{
+    initWindow();
+}
 
 Window::~Window()
 {
@@ -22,7 +25,10 @@ Window::~Window()
     glfwTerminate();
 }
 
-void Window::setInputController(Input::InputController *controller) { _inputControllerPtr = controller; }
+void Window::setInputController(std::shared_ptr<Input::InputController> controller)
+{
+    _inputController = controller;
+}
 
 void Window::initWindow()
 {
@@ -65,8 +71,8 @@ void Window::framebufferResizeCallback(GLFWwindow *_window, int width, int heigh
 void Window::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     auto windowInstance = static_cast<Window *>(glfwGetWindowUserPointer(window));
-    if (windowInstance && windowInstance->_inputControllerPtr) {
-        windowInstance->_inputControllerPtr->handleKeyEvent(key, scancode, action, mods);
+    if (windowInstance && windowInstance->_inputController) {
+        windowInstance->_inputController->handleKeyEvent(key, scancode, action, mods);
     } else {
     }
 }
@@ -74,8 +80,8 @@ void Window::KeyCallback(GLFWwindow *window, int key, int scancode, int action, 
 void Window::MouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
 {
     auto windowInstance = static_cast<Window *>(glfwGetWindowUserPointer(window));
-    if (windowInstance && windowInstance->_inputControllerPtr) {
-        windowInstance->_inputControllerPtr->handleMouseButtonEvent(button, action, mods);
+    if (windowInstance && windowInstance->_inputController) {
+        windowInstance->_inputController->handleMouseButtonEvent(button, action, mods);
     } else {
         SPDLOG_WARN("MouseButtonCallback: Window or InputController pointer invalid!");
     }
@@ -84,8 +90,8 @@ void Window::MouseButtonCallback(GLFWwindow *window, int button, int action, int
 void Window::CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
 {
     auto windowInstance = static_cast<Window *>(glfwGetWindowUserPointer(window));
-    if (windowInstance && windowInstance->_inputControllerPtr) {
-        windowInstance->_inputControllerPtr->handleCursorPosEvent(xpos, ypos);
+    if (windowInstance && windowInstance->_inputController) {
+        windowInstance->_inputController->handleCursorPosEvent(xpos, ypos);
     } else {
         SPDLOG_WARN("CursorPosCallback: Window or InputController pointer invalid!");
     }
@@ -94,8 +100,8 @@ void Window::CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
 void Window::ScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
 {
     auto windowInstance = static_cast<Window *>(glfwGetWindowUserPointer(window));
-    if (windowInstance && windowInstance->_inputControllerPtr) {
-        windowInstance->_inputControllerPtr->handleScrollEvent(xoffset, yoffset);
+    if (windowInstance && windowInstance->_inputController) {
+        windowInstance->_inputController->handleScrollEvent(xoffset, yoffset);
     } else {
         SPDLOG_WARN("ScrollCallback: Window or InputController pointer invalid!");
     }

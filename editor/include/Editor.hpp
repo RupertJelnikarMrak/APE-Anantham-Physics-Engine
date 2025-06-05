@@ -1,4 +1,5 @@
 #pragma once
+#include "Input/InputController.hpp"
 #include "Platform/Window.hpp"
 
 namespace Editor
@@ -13,17 +14,21 @@ public:
     Editor() = default;
     ~Editor() = default;
 
-    void Run();
+    void run();
 
 private:
-    void Update();
-    void Render();
-    void Shutdown();
+    void init();
+    void update();
+    void render();
+    void stop();
 
     Anantham::Platform::Window _window{
         EDITOR_WINDOW_WIDTH,
         EDITOR_WINDOW_HEIGHT,
         EDITOR_WINDOW_NAME};
+
+    std::shared_ptr<Anantham::Input::InputController> _inputController{
+        std::make_shared<Anantham::Input::InputController>(_window)};
 };
 
 } // namespace Editor

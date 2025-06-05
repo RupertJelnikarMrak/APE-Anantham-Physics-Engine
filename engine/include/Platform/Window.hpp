@@ -7,6 +7,7 @@
 
 // std
 #include <cstdint>
+#include <memory>
 #include <string>
 
 namespace Anantham::Input
@@ -28,6 +29,7 @@ public:
     Window(Window &&) = delete;
     Window &operator=(Window &&) = delete;
 
+    void pollEvents() { glfwPollEvents(); }
     bool shouldClose() const { return glfwWindowShouldClose(_window); }
     VkExtent2D getExtent() const
     {
@@ -39,7 +41,7 @@ public:
 
     void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 
-    void setInputController(Input::InputController *controller);
+    void setInputController(std::shared_ptr<Input::InputController> controller);
 
     void getCursorPosition(double &x, double &y) const;
 
@@ -65,7 +67,7 @@ private:
     std::string _windowName;
     GLFWwindow *_window;
 
-    Input::InputController *_inputControllerPtr = nullptr;
+    std::shared_ptr<Input::InputController> _inputController;
 };
 
 } // namespace Anantham::Platform

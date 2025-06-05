@@ -38,7 +38,10 @@ void InputController::setDefaultMouseButtonBindings(ActionKeyMap &mouseButtonBin
     _mouseButtonBindings = mouseButtonBindings;
 }
 
-void InputController::clearKeyBind(const std::string &actionName) { _keyBindings.erase(actionName); }
+void InputController::clearKeyBind(const std::string &actionName)
+{
+    _keyBindings.erase(actionName);
+}
 
 void InputController::resetKeyBind(const std::string &actionName)
 {
@@ -50,7 +53,10 @@ void InputController::resetKeyBind(const std::string &actionName)
     }
 }
 
-void InputController::clearMouseButtonBind(const std::string &actionName) { _mouseButtonBindings.erase(actionName); }
+void InputController::clearMouseButtonBind(const std::string &actionName)
+{
+    _mouseButtonBindings.erase(actionName);
+}
 
 void InputController::resetMouseButtonBind(const std::string &actionName)
 {
@@ -235,8 +241,6 @@ void InputController::update()
     _previousCursorY = _cursorY;
     _previousScrollX = _scrollX;
     _previousScrollY = _scrollY;
-
-    glfwPollEvents();
 }
 
 void InputController::handleKeyEvent(int key, int scancode, int action, int mods)
