@@ -1,0 +1,144 @@
+#include "Ecs/Scenes/Scene.hpp"
+
+#include "Ecs/Components/Components.hpp"
+#include "Rendering/Buffer.hpp"
+#include "Rendering/Descriptors.hpp"
+#include "Rendering/FrameInfo.hpp"
+#include "Resources/Mesh.hpp"
+#include <vulkan/vulkan_core.h>
+
+// libs
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
+
+namespace Anantham::Ecs::Scenes
+{
+
+Scene::Scene(Rendering::GraphicsDevice &device, Rendering::Renderer &renderer, Platform::Window &window)
+    : _device{device}, _renderer{renderer}, _window{window}
+{
+    _window.setInputController(&_inputController);
+
+    _globalPool = Anantham::Rendering::DescriptorPool::Builder(_device)
+                      .setMaxSets(Anantham::Rendering::SwapChain::MAX_FRAMES_IN_FLIGHT)
+                      .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, Anantham::Rendering::SwapChain::MAX_FRAMES_IN_FLIGHT)
+                      .build();
+
+    for (int i = 0; i < _uboBuffers.size(); i++) {
+        _uboBuffers[i] = std::make_unique<Rendering::Buffer>(
+            _device,
+            sizeof(Rendering::GlobalUbo),
+            1,
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        _uboBuffers[i]->map();
+    }
+
+    auto globalSetLayout = Rendering::DescriptorSetLayout::Builder(_device)
+                               .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+                               .build();
+
+    for (int i = 0; i < _globalDescriptorSets.size(); i++) {
+        auto bufferInfo = _uboBuffers[i]->descriptorInfo();
+        Rendering::DescriptorWriter(*globalSetLayout, *_globalPool)
+            .writeBuffer(0, &bufferInfo)
+            .build(_globalDescriptorSets[i]);
+    }
+
+    createSystems(_renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout());
+    loadObjects();
+}
+
+void Scene::drawFrame(float frameTime)
+{
+    if (auto commandBuffer = _renderer.beginFrame()) {
+        int frameIndex = _renderer.getFrameIndex();
+        Rendering::FrameInfo frameInfo{
+            frameIndex,
+            frameTime,
+            commandBuffer,
+            _camera,
+            _globalDescriptorSets[frameIndex],
+            _registry,
+            _inputController};
+
+        _inputController.update();
+
+        _cameraSystem->update(frameInfo);
+
+        Rendering::GlobalUbo ubo{};
+        ubo.projection = _camera.getProjection();
+        ubo.view = _camera.getView();
+        ubo.inverseView = _camera.getInverseView();
+        ubo.directionalLightColor = {.8f, .9f, 1.f, 1.f};
+        _uboBuffers[frameIndex]->writeToBuffer(&ubo);
+        _uboBuffers[frameIndex]->flush();
+
+        _renderer.beginSwapChainRenderPass(commandBuffer);
+
+        _meshRenderSystem->render(frameInfo);
+
+        _renderer.endSwapChainRenderPass(commandBuffer);
+        _renderer.endFrame();
+    }
+}
+
+void Scene::createSystems(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
+{
+    _cameraSystem = std::make_unique<Systems::CameraSystem>(_camera, _inputController, _renderer);
+    _meshRenderSystem =
+        std::make_unique<Systems::MeshRenderSystem>(_device, renderPass, globalSetLayout, _resourceManager);
+}
+
+void Scene::loadObjects()
+{
+    using namespace Resources;
+    _resourceManager.meshCache.put("SmoothVase", Mesh::createMeshFromFile(_device, "assets/models/smooth_vase.obj"));
+    _resourceManager.meshCache.put("Cube", Mesh::createMeshFromFile(_device, "assets/models/cube.obj"));
+    _resourceManager.meshCache.put("Quad", Mesh::createMeshFromFile(_device, "assets/models/quad.obj"));
+
+    auto entity = _registry.create();
+    _registry.emplace<Components::Transform>(
+        entity,
+        Components::Transform{
+            .translation = {0.f, 1.f, 0.f},
+            .rotation = {0.f, 0.f, 0.f},
+        });
+    _registry.emplace<Components::Mesh>(entity, Components::Mesh{"SmoothVase"});
+
+    entity = _registry.create();
+    _registry.emplace<Components::Transform>(
+        entity,
+        Components::Transform{
+            .translation = {0.f, -1.f, 0.f},
+            .rotation = {0.5f, 0.5f, 0.f},
+        });
+    _registry.emplace<Components::Mesh>(entity, Components::Mesh{"Cube"});
+
+    entity = _registry.create();
+    _registry.emplace<Components::Transform>(
+        entity,
+        Components::Transform{
+            .translation = {0.f, 0.f, -2.f},
+            .rotation = {0.f, 0.f, 0.f},
+        });
+    _registry.emplace<Components::Camera>(entity, Components::Camera{.active = true});
+
+    // entity = _registry.create();
+    // _registry.emplace<Components::Transform>(
+    //     entity,
+    //     Components::Transform{
+    //         .translation = {1.f, 1.f, 1.f},
+    //     });
+    // _registry.emplace<Components::PointLight>(
+    //     entity,
+    //     Components::PointLight{
+    //         .color = {1.f, 1.f, 1.f},
+    //         .intensity = 1.f,
+    //         .radius = 10.f,
+    //     });
+}
+
+} // namespace Anantham::Ecs::Scenes

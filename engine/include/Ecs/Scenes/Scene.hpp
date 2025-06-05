@@ -1,0 +1,52 @@
+#pragma once
+
+#include "Ecs/Systems/CameraSystem.hpp"
+#include "Ecs/Systems/MeshRenderSystem.hpp"
+#include "Input/InputController.hpp"
+#include "Rendering/Buffer.hpp"
+#include "Rendering/Descriptors.hpp"
+#include "Rendering/FrameInfo.hpp"
+#include "Rendering/GraphicsDevice.hpp"
+#include "Rendering/Renderer.hpp"
+#include "Resources/ResourceManager.hpp"
+
+#include <entt/entt.hpp>
+#include <memory>
+#include <vulkan/vulkan_core.h>
+
+namespace Anantham::Ecs::Scenes
+{
+
+class Scene
+{
+public:
+    Scene(Rendering::GraphicsDevice &device, Rendering::Renderer &renderer, Platform::Window &window);
+    ~Scene() = default;
+
+    void drawFrame(float frameTime);
+
+private:
+    void createSystems(VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+    void destroySystems();
+    void loadObjects();
+
+    entt::registry _registry;
+
+    Rendering::GlobalUbo _globalUbo{};
+    Rendering::GraphicsDevice &_device;
+    Rendering::Renderer &_renderer;
+    Platform::Window &_window;
+    Input::InputController _inputController{_window};
+    Resources::ResourceManager _resourceManager{_device};
+
+    std::unique_ptr<Anantham::Rendering::DescriptorPool> _globalPool{};
+    std::vector<std::unique_ptr<Rendering::Buffer>> _uboBuffers{Rendering::SwapChain::MAX_FRAMES_IN_FLIGHT};
+    std::vector<VkDescriptorSet> _globalDescriptorSets{Rendering::SwapChain::MAX_FRAMES_IN_FLIGHT};
+
+    Anantham::Rendering::Camera _camera{};
+
+    std::unique_ptr<Systems::CameraSystem> _cameraSystem;
+    std::unique_ptr<Systems::MeshRenderSystem> _meshRenderSystem;
+};
+
+} // namespace Anantham::Ecs::Scenes

@@ -8,7 +8,8 @@
         "entt",
         "glm",
         "glfw3",
-        "tinyobjloader"
+        "tinyobjloader",
+        "imgui"
     ],
     "default-features": []
 }

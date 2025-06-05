@@ -22,7 +22,7 @@
             "name": "windows-release",
             "displayName": "Windows Release",
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/windows/rlease",
+            "binaryDir": "${sourceDir}/build/windows/release",
             "toolchainFile": "${sourceDir}/toolchain-mingw.cmake",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
@@ -30,5 +30,42 @@
                 "VCPKG_HOST_TRIPLET": "x64-mingw-static"
             }
         }
-    ]
+    ],
+    "buildPresets": [
+        {
+            "name": "windows-debug-build-all",
+            "configurePreset": "windows-debug",
+            "displayName": "Build All (Debug)",
+            "description": "Builds AnanthamEditor and AnanthamEngine (Debug) including assets and shaders.",
+            "jobs": 8
+        },
+        {
+            "name": "windows-release-build-all",
+            "configurePreset": "windows-release",
+            "displayName": "Build All (Release)",
+            "description": "Builds AnanthamEditor and AnanthamEngine (Release) including assets and shaders.",
+            "jobs": 8
+        },
+        {
+            "name": "windows-debug-build-editor-only",
+            "configurePreset": "windows-debug",
+            "displayName": "Build Editor Only (Debug)",
+            "description": "Specifically builds only the AnanthamEditor target (and its direct dependencies).",
+            "targets": [
+                "AnanthamEditor"
+            ],
+            "jobs": 8
+        },
+        {
+            "name": "windows-debug-build-engine-only",
+            "configurePreset": "windows-debug",
+            "displayName": "Build Engine Library Only (Debug)",
+            "description": "Specifically builds only the AnanthamEngine library (and its direct dependencies like shaders/assets).",
+            "targets": [
+                "AnanthamEngine"
+            ],
+            "jobs": 8
+        }
+    ],
+    "testPresets": []
 }
