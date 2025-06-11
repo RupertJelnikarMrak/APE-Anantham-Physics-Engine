@@ -1,13 +1,13 @@
 #pragma once
 
 // lib
+#include <memory>
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan_core.h>
 
 // std
 #include <cstdint>
-#include <memory>
 #include <string>
 
 namespace Anantham::Input
@@ -39,9 +39,9 @@ public:
     void resetResizedFlag() { _resized = false; }
     GLFWwindow *getGLFWwindow() const { return _window; }
 
-    void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
+    std::shared_ptr<Input::InputController> getInputController() const { return _inputController; }
 
-    void setInputController(std::shared_ptr<Input::InputController> controller);
+    void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 
     void getCursorPosition(double &x, double &y) const;
 

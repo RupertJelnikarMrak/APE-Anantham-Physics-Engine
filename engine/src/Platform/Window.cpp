@@ -25,11 +25,6 @@ Window::~Window()
     glfwTerminate();
 }
 
-void Window::setInputController(std::shared_ptr<Input::InputController> controller)
-{
-    _inputController = controller;
-}
-
 void Window::initWindow()
 {
     glfwInit();
@@ -49,6 +44,8 @@ void Window::initWindow()
     glfwSetMouseButtonCallback(_window, MouseButtonCallback);
     glfwSetCursorPosCallback(_window, CursorPosCallback);
     glfwSetScrollCallback(_window, ScrollCallback);
+
+    _inputController = std::make_shared<Input::InputController>(*this);
 }
 
 void Window::createWindowSurface(VkInstance instance, VkSurfaceKHR *surface)

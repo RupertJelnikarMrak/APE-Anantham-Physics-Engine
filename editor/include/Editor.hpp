@@ -1,6 +1,12 @@
 #pragma once
+#include "Ecs/Scenes/Base.hpp"
 #include "Input/InputController.hpp"
 #include "Platform/Window.hpp"
+#include "Rendering/Descriptors.hpp"
+#include "Rendering/GraphicsDevice.hpp"
+#include "Rendering/Renderer.hpp"
+#include "Resources/ResourceManager.hpp"
+#include <memory>
 
 namespace Editor
 {
@@ -11,7 +17,7 @@ namespace Editor
 class Editor
 {
 public:
-    Editor() = default;
+    Editor();
     ~Editor() = default;
 
     void run();
@@ -26,9 +32,15 @@ private:
         EDITOR_WINDOW_WIDTH,
         EDITOR_WINDOW_HEIGHT,
         EDITOR_WINDOW_NAME};
+    Anantham::Rendering::GraphicsDevice _graphicsDevice{_window};
+    Anantham::Rendering::Renderer _renderer{_window, _graphicsDevice};
+    Anantham::Resources::ResourceManager _resourceManager{_graphicsDevice};
 
-    std::shared_ptr<Anantham::Input::InputController> _inputController{
-        std::make_shared<Anantham::Input::InputController>(_window)};
+    std::shared_ptr<Anantham::Input::InputController> _inputController;
+
+    std::unique_ptr<Anantham::Rendering::DescriptorPool> _imguiPool;
+
+    std::unique_ptr<Anantham::Ecs::Scenes::Base> _activeScene;
 };
 
 } // namespace Editor
