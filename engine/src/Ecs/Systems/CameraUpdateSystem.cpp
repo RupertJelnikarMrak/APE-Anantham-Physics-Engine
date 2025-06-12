@@ -1,7 +1,6 @@
-#include "Ecs/Systems/CameraSystem.hpp"
+#include "Ecs/Systems/CameraUpdateSystem.hpp"
 #include "Ecs/Components/Components.hpp"
 #include "Input/InputController.hpp"
-#include "Rendering/FrameInfo.hpp"
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
@@ -14,30 +13,38 @@ namespace Anantham::Ecs::Systems
 
 #define MOUSE_SENSITIVITY 0.001f
 
-CameraSystem::CameraSystem(Rendering::Camera &camera, Input::InputController &input, Rendering::Renderer &renderer)
+CameraUpdateSystem::CameraUpdateSystem(
+    Rendering::Camera &camera,
+    Input::InputController &input,
+    Rendering::Renderer &renderer)
     : _camera(camera), _input(input), _renderer(renderer)
 {
     setupControls();
 }
 
-void CameraSystem::update(Rendering::FrameInfo &frameInfo)
+void CameraUpdateSystem::update(entt::registry &registry, float deltaTime)
 {
     entt::entity cameraEntity = entt::null;
-    frameInfo.registry.view<const Components::Camera>().each([&](auto entity, const Components::Camera &camera) {
-        if (camera.active) {
-            cameraEntity = entity;
-        }
-    });
+    registry.view<const Components::Camera>().each(
+        [&](auto entity, const Components::Camera &camera) {
+            if (camera.active) {
+                cameraEntity = entity;
+            }
+        });
     if (cameraEntity == entt::null) {
         SPDLOG_WARN("No active camera found in the scene.");
         return;
     }
 
-    auto &cameraTransform = frameInfo.registry.get<Components::Transform>(cameraEntity);
-    auto &cameraComponent = frameInfo.registry.get<Components::Camera>(cameraEntity);
+    auto &cameraTransform = registry.get<Components::Transform>(cameraEntity);
+    auto &cameraComponent = registry.get<Components::Camera>(cameraEntity);
 
     float aspect = _renderer.getAspectRatio();
-    _camera.setPerspectiveProjection(cameraComponent.fov, aspect, cameraComponent.near, cameraComponent.far);
+    _camera.setPerspectiveProjection(
+        cameraComponent.fov,
+        aspect,
+        cameraComponent.near,
+        cameraComponent.far);
 
     // Handle camera movement
 
@@ -83,7 +90,8 @@ void CameraSystem::update(Rendering::FrameInfo &frameInfo)
             rotate.x -= 1.f;
 
         if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) {
-            cameraTransform.rotation += cameraComponent.lookSpeed * frameInfo.frameTime * glm::normalize(rotate);
+            cameraTransform.rotation +=
+                cameraComponent.lookSpeed * deltaTime * glm::normalize(rotate);
         }
     }
 
@@ -111,13 +119,14 @@ void CameraSystem::update(Rendering::FrameInfo &frameInfo)
         moveDir -= upDir;
 
     if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
-        cameraTransform.translation += cameraComponent.moveSpeed * frameInfo.frameTime * glm::normalize(moveDir);
+        cameraTransform.translation +=
+            cameraComponent.moveSpeed * deltaTime * glm::normalize(moveDir);
     }
 
     _camera.setViewYXZ(cameraTransform.translation, cameraTransform.rotation);
 }
 
-void CameraSystem::setupControls()
+void CameraUpdateSystem::setupControls()
 {
     // TODO: One day this should become a default binding
     _input.bindKeyToAction("CameraMoveForward", GLFW_KEY_W);

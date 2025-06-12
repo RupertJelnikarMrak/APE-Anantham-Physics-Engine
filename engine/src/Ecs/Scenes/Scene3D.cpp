@@ -1,13 +1,19 @@
 #include "Ecs/Scenes/Scene3D.hpp"
+#include "Ecs/Systems/CameraUpdateSystem.hpp"
+#include "Ecs/Systems/MeshRenderSystem.hpp"
+#include <memory>
 
 namespace Anantham::Ecs::Scenes
 {
 
-void Scene3D::update(float deltaTime) {}
-
-void Scene3D::render(Rendering::RenderQueue &renderQueue)
+Scene3D::Scene3D(
+    Rendering::GraphicsDevice &graphicsDevice,
+    Rendering::Renderer &renderer,
+    Input::InputController &inputController)
+    : _graphicsDevice(graphicsDevice), _renderer(renderer), _inputController(inputController)
 {
-    _meshRenderSystem.render(_registry, renderQueue);
+    _updateSystems.push_back(
+        std::make_unique<Ecs::Systems::CameraUpdateSystem>(_camera, _inputController, _renderer));
 }
 
 } // namespace Anantham::Ecs::Scenes

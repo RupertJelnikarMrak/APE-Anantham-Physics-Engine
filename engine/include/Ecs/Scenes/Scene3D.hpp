@@ -1,34 +1,36 @@
 #pragma once
 
-#include "Base.hpp"
-#include "Ecs/Systems/CameraSystem.hpp"
-#include "Ecs/Systems/MeshRenderSystem.hpp"
-#include "Rendering/RenderQueue.hpp"
+#include "IScene.hpp"
+#include "Input/InputController.hpp"
+#include "Rendering/Camera.hpp"
+#include "Rendering/Descriptors.hpp"
+#include "Rendering/GraphicsDevice.hpp"
+#include "Rendering/Renderer.hpp"
 
 namespace Anantham::Ecs::Scenes
 {
 
-class Scene3D : public Base
+class Scene3D : public IScene
 {
 public:
-    Scene3D() = delete;
+    Scene3D(
+        Rendering::GraphicsDevice &graphicsDevice,
+        Rendering::Renderer &renderer,
+        Input::InputController &inputController);
     ~Scene3D() override = default;
 
-    /**
-     * @brief Updates the scene for the current frame.
-     * @param deltaTime The time elapsed since the last frame.
-     */
-    void update(float deltaTime) override;
+protected:
+    Rendering::GraphicsDevice &_graphicsDevice;
+    Rendering::Renderer &_renderer;
+    Input::InputController &_inputController;
+    Rendering::GlobalUbo _globalUbo{};
 
-    /**
-     * @brief Populates the render queue with commands for drawing the scene.
-     * @param renderQueue The render queue to populate with draw commands.
-     */
-    void render(Rendering::RenderQueue &renderQueue) override;
+    std::unique_ptr<Anantham::Rendering::DescriptorPool> _globalPool{};
+    std::vector<std::unique_ptr<Rendering::Buffer>> _uboBuffers{
+        Rendering::SwapChain::MAX_FRAMES_IN_FLIGHT};
+    std::vector<VkDescriptorSet> _globalDescriptorSets{Rendering::SwapChain::MAX_FRAMES_IN_FLIGHT};
 
-private:
-    Systems::CameraSystem _cameraSystem;
-    Systems::MeshRenderSystem _meshRenderSystem;
+    Rendering::Camera _camera{};
 };
 
 } // namespace Anantham::Ecs::Scenes

@@ -1,9 +1,9 @@
 #pragma once
 
-// #include "Rendering/FrameInfo.hpp"
+#include "Ecs/Systems/ISystem.hpp"
+#include "Rendering/FrameInfo.hpp"
 #include "Rendering/GraphicsDevice.hpp"
 #include "Rendering/Pipeline.hpp"
-#include "Rendering/RenderQueue.hpp"
 #include "Resources/ResourceManager.hpp"
 
 #include <entt/entity/fwd.hpp>
@@ -17,7 +17,7 @@
 namespace Anantham::Ecs::Systems
 {
 
-class MeshRenderSystem
+class MeshRenderSystem : public IRenderSystem
 {
 public:
     MeshRenderSystem(
@@ -32,10 +32,7 @@ public:
     MeshRenderSystem(MeshRenderSystem &&) = delete;
     MeshRenderSystem &operator=(MeshRenderSystem &&) = delete;
 
-    // void operator()(Rendering::FrameInfo &frameInfo) { render(frameInfo); }
-
-    // void render(Rendering::FrameInfo &frameInfo);
-    void render(entt::registry &registry, Rendering::RenderQueue &renderQueue);
+    void render(entt::registry &registry, Rendering::FrameInfo &frameInfo) override;
 
 private:
     void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);

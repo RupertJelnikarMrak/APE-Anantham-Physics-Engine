@@ -1,20 +1,21 @@
 #pragma once
 
+#include "Ecs/Systems/ISystem.hpp"
 #include "Input/InputController.hpp"
 #include "Rendering/Camera.hpp"
-#include "Rendering/FrameInfo.hpp"
 #include "Rendering/Renderer.hpp"
+#include <entt/entity/fwd.hpp>
 
 namespace Anantham::Ecs::Systems
 {
 
-class CameraSystem
+class CameraUpdateSystem : public IUpdateSystem
 {
 public:
-    CameraSystem(Rendering::Camera &, Input::InputController &, Rendering::Renderer &);
-    ~CameraSystem() = default;
+    CameraUpdateSystem(Rendering::Camera &, Input::InputController &, Rendering::Renderer &);
+    ~CameraUpdateSystem() = default;
 
-    void update(Rendering::FrameInfo &);
+    void update(entt::registry &registry, float deltaTime) override;
 
 private:
     void setupControls();

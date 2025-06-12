@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Ecs/Scenes/Base.hpp"
+#include "Ecs/Scenes/IScene.hpp"
 #include "Input/InputController.hpp"
 #include "Platform/Window.hpp"
 #include "Rendering/Descriptors.hpp"
@@ -41,7 +41,7 @@ private:
 
     std::shared_ptr<Anantham::Input::InputController> _inputController;
     std::unique_ptr<Anantham::Rendering::DescriptorPool> _imguiPool;
-    std::unique_ptr<Anantham::Ecs::Scenes::Base> _activeScene;
+    std::unique_ptr<Anantham::Ecs::Scenes::IScene> _activeScene;
 
     std::chrono::time_point<std::chrono::steady_clock> _lastFrameTime;
 };

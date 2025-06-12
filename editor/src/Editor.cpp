@@ -15,10 +15,6 @@ void Editor::init()
 {
     _inputController = _window.getInputController();
     _imguiPool = Anantham::Rendering::DescriptorPool::Builder(_graphicsDevice).build();
-
-    // TODO I have still not decided whether there is only one sceen which is the Engine window
-    // sceen or to have 2 or more active scenes including the Editor buttons etc.
-    _activeScene = nullptr;
 }
 
 void Editor::stop() {}

@@ -27,7 +27,5 @@ struct FrameInfo {
     VkCommandBuffer commandBuffer;
     Camera &camera;
     VkDescriptorSet globalDescriptorSet;
-    entt::registry &registry;
-    Input::InputController &inputController;
 };
 } // namespace Anantham::Rendering
