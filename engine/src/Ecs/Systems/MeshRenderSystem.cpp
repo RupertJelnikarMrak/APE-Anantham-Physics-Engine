@@ -1,12 +1,17 @@
 #include "Ecs/Systems/MeshRenderSystem.hpp"
 #include "Ecs/Components/Components.hpp"
+#include "Rendering/RenderQueue.hpp"
+#include "Resources/Mesh.hpp"
 #include "Resources/ResourceManager.hpp"
+#include <entt/entity/fwd.hpp>
+#include <memory>
 
 // libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
+#include <spdlog/spdlog.h>
 
 // std
 #include <cassert>
@@ -30,7 +35,10 @@ MeshRenderSystem::MeshRenderSystem(
     createPipeline(renderPass);
 }
 
-MeshRenderSystem::~MeshRenderSystem() { vkDestroyPipelineLayout(_device.getDevice(), _pipelineLayout, nullptr); }
+MeshRenderSystem::~MeshRenderSystem()
+{
+    vkDestroyPipelineLayout(_device.getDevice(), _pipelineLayout, nullptr);
+}
 
 void MeshRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
 {
@@ -47,7 +55,11 @@ void MeshRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayou
     pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
     pipelineLayoutInfo.pushConstantRangeCount = 1;
     pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-    if (vkCreatePipelineLayout(_device.getDevice(), &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
+    if (vkCreatePipelineLayout(
+            _device.getDevice(),
+            &pipelineLayoutInfo,
+            nullptr,
+            &_pipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create pipeline layout!");
     }
 }
@@ -126,38 +138,57 @@ glm::mat3 normalMatrix(const Components::Transform &transform)
     };
 }
 
-void MeshRenderSystem::render(Rendering::FrameInfo &frameInfo)
+void MeshRenderSystem::render(entt::registry &registry, Rendering::RenderQueue &renderQueue)
 {
-    _pipeline->bind(frameInfo.commandBuffer);
+    auto view = registry.view<Components::Transform, Components::Mesh>();
+    for (const entt::entity entity : view) {
+        auto &transformComponent = view.get<Components::Transform>(entity);
+        auto &meshComponent = view.get<Components::Mesh>(entity);
 
-    vkCmdBindDescriptorSets(
-        frameInfo.commandBuffer,
-        VK_PIPELINE_BIND_POINT_GRAPHICS,
-        _pipelineLayout,
-        0,
-        1,
-        &frameInfo.globalDescriptorSet,
-        0,
-        nullptr);
+        std::shared_ptr<Resources::Mesh> mesh =
+            _resourceManager.meshCache.get(meshComponent.meshName);
 
-    frameInfo.registry.view<const Components::Transform, const Components::Mesh>().each(
-        [&](auto entity, const Components::Transform &transform, const Components::Mesh &mesh) {
-            SimplePushConstantData push{};
-            push.modelMatrix = mat4(transform);
-            push.normalMatrix = normalMatrix(transform);
+        if (!mesh) {
+            SPDLOG_DEBUG("MeshRenderSystem: Mesh '{}' not found", meshComponent.meshName);
+            continue;
+        }
 
-            vkCmdPushConstants(
-                frameInfo.commandBuffer,
-                _pipelineLayout,
-                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-                0,
-                sizeof(SimplePushConstantData),
-                &push);
-
-            auto meshObj = _resourceManager.meshCache.get(mesh.meshName);
-            meshObj->bind(frameInfo.commandBuffer);
-            meshObj->draw(frameInfo.commandBuffer);
-        });
+        renderQueue.submit(mesh.get(), mat4(transformComponent));
+    }
 }
+
+// void MeshRenderSystem::render(Rendering::FrameInfo &frameInfo)
+// {
+//     _pipeline->bind(frameInfo.commandBuffer);
+//
+//     vkCmdBindDescriptorSets(
+//         frameInfo.commandBuffer,
+//         VK_PIPELINE_BIND_POINT_GRAPHICS,
+//         _pipelineLayout,
+//         0,
+//         1,
+//         &frameInfo.globalDescriptorSet,
+//         0,
+//         nullptr);
+//
+//     frameInfo.registry.view<const Components::Transform, const Components::Mesh>().each(
+//         [&](auto entity, const Components::Transform &transform, const Components::Mesh &mesh) {
+//             SimplePushConstantData push{};
+//             push.modelMatrix = mat4(transform);
+//             push.normalMatrix = normalMatrix(transform);
+//
+//             vkCmdPushConstants(
+//                 frameInfo.commandBuffer,
+//                 _pipelineLayout,
+//                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+//                 0,
+//                 sizeof(SimplePushConstantData),
+//                 &push);
+//
+//             auto meshObj = _resourceManager.meshCache.get(mesh.meshName);
+//             meshObj->bind(frameInfo.commandBuffer);
+//             meshObj->draw(frameInfo.commandBuffer);
+//         });
+// }
 
 } // namespace Anantham::Ecs::Systems

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Ecs/Scenes/Base.hpp"
 #include "Input/InputController.hpp"
 #include "Platform/Window.hpp"
@@ -6,6 +7,8 @@
 #include "Rendering/GraphicsDevice.hpp"
 #include "Rendering/Renderer.hpp"
 #include "Resources/ResourceManager.hpp"
+
+#include <chrono>
 #include <memory>
 
 namespace Editor
@@ -24,7 +27,7 @@ public:
 
 private:
     void init();
-    void update();
+    void update(float deltaTime);
     void render();
     void stop();
 
@@ -37,10 +40,10 @@ private:
     Anantham::Resources::ResourceManager _resourceManager{_graphicsDevice};
 
     std::shared_ptr<Anantham::Input::InputController> _inputController;
-
     std::unique_ptr<Anantham::Rendering::DescriptorPool> _imguiPool;
-
     std::unique_ptr<Anantham::Ecs::Scenes::Base> _activeScene;
+
+    std::chrono::time_point<std::chrono::steady_clock> _lastFrameTime;
 };
 
 } // namespace Editor
